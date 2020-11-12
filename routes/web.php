@@ -13,22 +13,17 @@ use App\Organizer;
 |
 */
 
-Route::get('/', function () {
-    Organizer::find(1)->update(['password_hash' => Hash::make('demopass1')]);
-    Organizer::find(2)->update(['password_hash' => Hash::make('demopass2')]);
-    return Organizer::find(1);
-});
-
 Auth::routes();
 
 Route::middleware('auth')->group(function() {
     Route::get('/','HomeController@index');
-    Route::resource('/channels', 'ChannelController');
     Route::resource('/events', 'EventController');
+    Route::resource('/events/{event}/channels', 'TicketController', ['only ' => ['create','store']]);
+    Route::resource('/events/{event}/ticket', 'TicketController', ['only ' => ['create','store']]);
+    Route::resource('/events/{event}/sessions', 'SessionController', ['only' => ['create','store','edit','update']]);
+    Route::resource('/events/{event}/rooms', 'RoomController', ['only' => ['create','store','edit','update']]);
     Route::resource('/reports', 'ReportController');
-    Route::resource('/rooms', 'RoomController');
-    Route::resource('/sessions', 'SessionController');
-    Route::resource('/tickets', 'TicketController');
+  
 });
 
 Route::get('/home', 'HomeController@index')->name('home');

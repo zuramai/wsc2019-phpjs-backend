@@ -16,9 +16,9 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::where('organizer_id',Auth::user()->id)->get();
+        $events = Event::withCount('registrations')->where('organizer_id',Auth::user()->id)->get();
         return view('events.index', compact('events'));
-        
+
     }
 
     /**
@@ -28,7 +28,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        return view('events.create');
     }
 
     /**
@@ -39,7 +39,21 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required|unique:events,slug|alpha_dash',
+            'date' => 'required|date'
+        ]);
+
+        $event = Event::create([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'date' => $request->date,
+            'organizer_id' => Auth::user()->id,
+        ]);
+
+        return redirect()->route('events.show', ['event' => $request->slug]);
+
     }
 
     /**
@@ -50,7 +64,8 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        //
+        $event = Event::where('slug',$id)->firstOrFail();
+        return view('events.show', compact('event'));
     }
 
     /**

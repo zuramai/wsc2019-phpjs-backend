@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Session;
+use App\Room;
+use App\Event;
+
 
 class SessionController extends Controller
 {
@@ -21,9 +25,10 @@ class SessionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($slug)
     {
-        //
+        $event = Event::where('slug',$slug)->firstOrFail();
+        return view('sessions.create', compact('event'));
     }
 
     /**
