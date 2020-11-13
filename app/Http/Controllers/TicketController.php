@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Ticket;
+use App\Event;
 
 class TicketController extends Controller
 {
@@ -21,9 +23,10 @@ class TicketController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($slug)
     {
-        //
+        $event = Event::where('slug',$slug)->first();
+        return view('tickets.create', compact('event'));
     }
 
     /**

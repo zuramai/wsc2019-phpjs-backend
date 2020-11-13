@@ -21,7 +21,7 @@
                     <span>Reports</span>
                 </h6>
                 <ul class="nav flex-column mb-2">
-                    <li class="nav-item"><a class="nav-link" href="reports/index.html">Room capacity</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('room_capacity', ['event' => $event->slug]) }}">Room capacity</a></li>
                 </ul>
             </div>
         </nav>
@@ -38,14 +38,18 @@
                 </div>
                 <span class="h6">{{$event->date}}</span>
             </div>
-
+            @if(session('success'))
+            <div class="alert alert-success">
+                {{session('success')}}
+            </div>
+            @endif
             <!-- Tickets -->
             <div id="tickets" class="mb-3 pt-3 pb-2">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
                     <h2 class="h4">Tickets</h2>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group mr-2">
-                            <a href="tickets/create.html" class="btn btn-sm btn-outline-secondary">
+                            <a href="{{ route('ticket.create', ['event' => $event->slug]) }}" class="btn btn-sm btn-outline-secondary">
                                 Create new ticket
                             </a>
                         </div>
@@ -93,27 +97,17 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td class="text-nowrap">08:30 - 10:00</td>
-                        <td>Talk</td>
-                        <td><a href="sessions/edit.html">Keynote</a></td>
-                        <td class="text-nowrap">An important person</td>
-                        <td class="text-nowrap">Main / Room A</td>
-                    </tr>
-                    <tr>
-                        <td class="text-nowrap">10:15 - 11:00</td>
-                        <td>Talk</td>
-                        <td><a href="sessions/edit.html">What's new in X?</a></td>
-                        <td class="text-nowrap">Another person</td>
-                        <td class="text-nowrap">Main / Room A</td>
-                    </tr>
-                    <tr>
-                        <td class="text-nowrap">10:15 - 11:00</td>
-                        <td>Workshop</td>
-                        <td><a href="sessions/edit.html">Hands-on with Y</a></td>
-                        <td class="text-nowrap">Another person</td>
-                        <td class="text-nowrap">Side / Room C</td>
-                    </tr>
+                        @foreach($event->rooms as $room)
+                            @foreach($room->sessions as $session)
+                            <tr>
+                                <td class="text-nowrap">{{ date('H:i', strtotime($session->start)) }} - {{ date('H:i', strtotime($session->end)) }}</td>
+                                <td>{{$session->type}}</td>
+                                <td><a href="{{ route('sessions.edit', ['event' => $event->slug, 'session' => $session->id]) }}">{{$session->title}}</a></td>
+                                <td class="text-nowrap">{{$session->speaker}}</td>
+                                <td class="text-nowrap">{{$room->name}}</td>
+                            </tr>
+                            @endforeach
+                        @endforeach
                     </tbody>
                 </table>
             </div>

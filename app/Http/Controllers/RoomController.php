@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Event;
+use App\Room;
+use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
@@ -21,9 +24,10 @@ class RoomController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($slug)
     {
-        //
+        $event = Event::where('slug',$slug)->first();
+        return view('rooms.create', compact('event'));
     }
 
     /**
@@ -32,9 +36,27 @@ class RoomController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $slug)
     {
-        //
+        $request->validate([
+            'name' => "required",
+            'channel' => "required",
+            'capacity' => 'required'
+        ]);
+
+        $room = new Room;
+        $room->name = $request->name;
+        $room->channel_id = $request->channel;
+        $room->capacity = $request->capacity;
+        $room->save();
+
+        session()->flash('success','Room successfully created');
+        return redirect()->route('events.show', ['event' => $slug]);
+    }
+
+    public function capacity(Request $request, $slug) {
+        $event = Event::where('slug',$slug)->first();
+        return view('reports.room_capacity', compact('event'));
     }
 
     /**

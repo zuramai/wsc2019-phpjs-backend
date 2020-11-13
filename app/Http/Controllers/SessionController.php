@@ -37,9 +37,32 @@ class SessionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request,$slug)
     {
-        //
+        $request->validate([
+            'type' => 'required',
+            'title' => 'required',
+            'speaker' => 'required',
+            'room' => 'required',
+            'cost' => "nullable",
+            'start' => "required",
+            'end' => 'required',
+            'description' => "required"
+        ]);
+        $event = Event::where('slug',$slug)->first();
+        $session = Session::create([
+            'room_id' => $request->room,
+            'title' => $request->title,
+            'description' => $request->description,
+            'speaker' => $request->speaker,
+            'start' => $request->start,
+            'end' => $request->end,
+            'type' => $request->type,
+            'cost' => $request->cost ?: 0
+        ]);
+
+        session()->flash('success','Session successfully created');
+        return redirect()->route('events.show',['event' => $event->slug]);
     }
 
     /**
@@ -59,9 +82,12 @@ class SessionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($slug,$id)
     {
-        //
+        $event = Event::where('slug',$slug)->first();
+        $session = Session::find($id);
+
+        return view('sessions.edit', compact('session', 'event'));
     }
 
     /**
@@ -71,9 +97,32 @@ class SessionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slug, $id)
     {
-        //
+        $request->validate([
+            'type' => 'required',
+            'title' => 'required',
+            'speaker' => 'required',
+            'room' => 'required',
+            'cost' => "nullable",
+            'start' => "required",
+            'end' => 'required',
+            'description' => "required"
+        ]);
+        $event = Event::where('slug',$slug)->first();
+        $session = Session::find($id)->update([
+            'room_id' => $request->room,
+            'title' => $request->title,
+            'description' => $request->description,
+            'speaker' => $request->speaker,
+            'start' => $request->start,
+            'end' => $request->end,
+            'type' => $request->type,
+            'cost' => $request->cost ?: 0
+        ]);
+
+        session()->flash('success','Session successfully updated');
+        return redirect()->route('events.show',['event' => $event->slug]);
     }
 
     /**
