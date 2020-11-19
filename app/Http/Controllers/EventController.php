@@ -74,9 +74,10 @@ class EventController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($slug)
     {
-        //
+        $event = Event::where('slug',$slug)->first();
+        return view('events.edit', compact('event'));
     }
 
     /**
@@ -88,7 +89,20 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required',
+            'date' => "required"
+        ]);
+
+        $event = Event::where('slug',$id)->first();
+        $event->update([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'date' => $request->date,
+        ]);
+        session()->flash('success','Event successfully updated!');
+        return redirect()->route('events.show', ['event'=> $id]);
     }
 
     /**

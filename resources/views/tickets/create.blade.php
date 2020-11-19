@@ -40,15 +40,15 @@
                 </div>
             </div>
 
-            <form class="needs-validation" novalidate action="events/detail.html">
-
+            <form class="needs-validation" novalidate action="{{ route('ticket.store', ['event' => $event->slug]) }}" method="pOST">
+                @csrf
                 <div class="row">
                     <div class="col-12 col-lg-4 mb-3">
                         <label for="inputName">Name</label>
                         <!-- adding the class is-invalid to the input, shows the invalid feedback below -->
-                        <input type="text" class="form-control is-invalid" id="inputName" name="name" placeholder="" value="">
+                        <input type="text" class="form-control {{$errors->any() ? 'is-invalid' : ''}}" id="inputName" name="name" placeholder="" value="">
                         <div class="invalid-feedback">
-                            Name is required.
+                            {{$errors->first('name')}}
                         </div>
                     </div>
                 </div>
