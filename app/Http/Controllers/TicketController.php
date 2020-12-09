@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ticket;
+use App\Models\EventTicket;
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 class TicketController extends Controller
@@ -22,9 +23,9 @@ class TicketController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Event $event)
     {
-        //
+        return view('tickets.create', compact('event'));
     }
 
     /**
@@ -33,9 +34,32 @@ class TicketController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Event $event)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'cost' => 'required',
+            'special_validity' => 'required',
+        ]);
+        
+        $valids = [];
+        if($request->special_validity == 'amount') $request->validate(['amount' => 'required']);
+        else if($request->special_validity == 'date') $request->validate(['date' => 'required']);
+            
+
+        array_push($valids, [
+            "type" => $request->special_validity,
+            $request->special_validity => ($request->special_validity == 'amount' ? $request->amount : $request->date)
+        ]);
+
+        $ticket = new EventTicket;
+        $ticket->event_id = $event->id;
+        $ticket->name = $request->name;
+        $ticket->cost = $request->cost;
+        $ticket->special_validity = json_encode($valids);
+        $ticket->save();
+
+        return redirect()->route('events.show', ['event' => $event->id]);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -14,7 +15,7 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -24,7 +25,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        return view('events.create');
     }
 
     /**
@@ -35,7 +36,20 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required',
+            'date' => 'required',
+        ]);
+
+        $event = new Event;
+        $event->name = $request->name;
+        $event->slug = $request->slug;
+        $event->date = $request->date;
+        $event->organizer_id = Auth::user()->id;
+        $event->save();
+        
+        return redirect()->route('events.show', ['event' => $event->id]);
     }
 
     /**
@@ -46,7 +60,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //
+        return view('events.detail', compact('event'));
     }
 
     /**
@@ -57,7 +71,7 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        //
+        return view('events.edit', compact('event'));
     }
 
     /**
@@ -69,7 +83,21 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required',
+            'date' => 'required',
+        ]);
+
+        $event = Event::find($event->id);
+        $event->name = $request->name;
+        $event->slug = $request->slug;
+        $event->date = $request->date;
+        $event->organizer_id = Auth::user()->id;
+        $event->save();
+        
+        session()->flash("success",'Event successfully updated');
+        return redirect()->route('events.show', ['event' => $event->id]);
     }
 
     /**

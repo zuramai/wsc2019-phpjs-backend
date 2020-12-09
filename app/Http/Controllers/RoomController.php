@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\Room;
 use Illuminate\Http\Request;
 
@@ -22,9 +23,9 @@ class RoomController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Event $event)
     {
-        //
+        return view('rooms.create', ['event' => $event]);
     }
 
     /**
@@ -33,9 +34,23 @@ class RoomController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Event $event)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'channel' => 'required',
+            'capacity' => 'required'
+        ]);
+
+        $room = new Room;
+        $room->name = $request->name;
+        $room->channel_id = $request->channel;
+        $room->capacity = $request->capacity;
+        $room->save();
+
+        session()->flash('success',  'Room Successfully created');
+        return redirect()->route('events.show', ['event' => $event->id]);
+
     }
 
     /**

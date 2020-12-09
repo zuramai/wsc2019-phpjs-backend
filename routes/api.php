@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\AuthController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,4 +19,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('v1')->group(function() {
+    Route::get('events', [EventController::class, 'index']);
+    Route::get('organizers/{organizer}/events/{event}', [EventController::class, 'show']);
+
+    Route::post('/login', [AuthController::class,'login']);
+    Route::post('organizers/{organizer}/events/{event}/registration', [EventController::class, 'registration']);
 });

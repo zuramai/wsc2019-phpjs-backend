@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Channel;
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 class ChannelController extends Controller
@@ -22,9 +23,9 @@ class ChannelController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Event $event)
     {
-        //
+        return view('channels.create', compact('event'));
     }
 
     /**
@@ -33,9 +34,20 @@ class ChannelController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Event $event)
     {
-        //
+        $request->validate([
+            'name' => 'required'
+        ]);
+        
+        $channel = new Channel;
+        $channel->event_id = $event->id;
+        $channel->name = $request->name;
+        $channel->save();
+        
+        
+        session()->flash('success','Channel successfully created');
+        return redirect()->route('events.show', ['event' => $event->id]);
     }
 
     /**
